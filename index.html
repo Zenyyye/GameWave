@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAME WAV 8-BIT</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+    <div class="crt-frame">
+        <div class="screen">
+            <div class="scanlines"></div>
+            <canvas id="particles"></canvas>
+
+            <div class="ui-layer">
+                <header>
+                    <div class="logo-box" id="logo">
+                        <h1>GAME<br>WAV</h1>
+                    </div>
+                    <div class="specs-box">
+                        <span id="sample-rate">44.1kHz</span>
+                        <span id="bit-depth">16-BIT</span>
+                        <span id="format-type">WAV</span>
+                    </div>
+                </header>
+
+                <!-- Classification Mode Toggle -->
+                <div class="mode-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="classificationToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">分类模式</span>
+                </div>
+
+                <!-- Category Management Panel (hidden by default) -->
+                <div id="categoryPanel" class="category-panel hidden">
+                    <div class="category-input">
+                        <input type="text" id="categoryName" placeholder="输入分类名 (如 BGM)" maxlength="20">
+                        <button id="addCategoryBtn" class="pixel-btn">+</button>
+                    </div>
+                    <div id="categoryList" class="category-list"></div>
+                </div>
+
+                <!-- Default Drop Zone (when classification OFF) -->
+                <div id="dropZone" class="drop-zone">
+                    <div class="pixel-border"></div>
+                    <div class="content">
+                        <div class="icon-pixel">
+                            <div class="pixel-arrow"></div>
+                        </div>
+                        <p class="blink">INSERT DISC</p>
+                        <p class="small">(DROP FILES HERE)</p>
+                        <input type="file" id="fileInput" accept=".mp3,.wav,.aiff,.aif" multiple hidden>
+                    </div>
+                </div>
+
+                <!-- Category Drop Zones Container (when classification ON) -->
+                <div id="categoryDropZones" class="category-zones hidden"></div>
+
+                <!-- Download All Button (shown when classification ON) -->
+                <button id="downloadAllBtn" class="download-btn hidden">📦 下载全部 (ZIP)</button>
+
+                <div id="fileList" class="file-list"></div>
+                <div id="status" class="status">READY PLAYER ONE</div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

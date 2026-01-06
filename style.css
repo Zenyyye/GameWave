@@ -1,0 +1,595 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+:root {
+    --bg: #1e1e1e;
+    --screen-bg: #111;
+    --neon-green: #4ec9b0;
+    /* Soft Cyan */
+    --neon-pink: #9cdcfe;
+    /* Light Blue */
+    --neon-blue: #dcdcaa;
+    /* Cream/Pale Yellow */
+    --crt-frame: #333;
+
+    /* Game Boy Palette */
+    --gb-0: #0f380f;
+    --gb-1: #306230;
+    --gb-2: #8bac0f;
+    --gb-3: #9bbc0f;
+}
+
+/* Selected Text Highlight */
+.selected {
+    color: var(--neon-pink) !important;
+    text-shadow: 0 0 10px var(--neon-pink);
+    background: rgba(156, 220, 254, 0.1);
+    border-radius: 4px;
+}
+
+/* Pale Blue Pulse */
+@keyframes neon-pulse {
+
+    0%,
+    100% {
+        text-shadow:
+            0 0 10px var(--neon-pink),
+            0 0 20px var(--neon-pink),
+            0 0 40px var(--neon-pink);
+        filter: brightness(1);
+    }
+
+    50% {
+        text-shadow:
+            0 0 5px var(--neon-pink),
+            0 0 10px var(--neon-pink);
+        filter: brightness(1.2);
+    }
+}
+
+@keyframes border-pulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 5px var(--neon-green),
+            inset 0 0 5px var(--neon-green);
+        border-color: var(--neon-green);
+    }
+
+    50% {
+        box-shadow:
+            0 0 15px var(--neon-green),
+            inset 0 0 10px var(--neon-green);
+        border-color: #afffafff;
+    }
+}
+
+body.gameboy-mode {
+    --bg: var(--gb-1);
+    --screen-bg: var(--gb-3);
+    --neon-green: var(--gb-0);
+    --neon-pink: var(--gb-0);
+    --neon-blue: var(--gb-0);
+    background-image: repeating-linear-gradient(45deg, var(--gb-2) 25%, transparent 25%, transparent 75%, var(--gb-2) 75%, var(--gb-2)), repeating-linear-gradient(45deg, var(--gb-2) 25%, var(--gb-1) 25%, var(--gb-1) 75%, var(--gb-2) 75%, var(--gb-2));
+    background-position: 0 0, 10px 10px;
+    background-size: 20px 20px;
+}
+
+body.gameboy-mode .crt-frame {
+    background: var(--gb-2);
+    box-shadow:
+        inset 0 0 20px var(--gb-0),
+        0 0 0 10px var(--gb-1),
+        5px 5px 0 var(--gb-0);
+    border-radius: 10px 10px 40px 10px;
+}
+
+body.gameboy-mode .screen {
+    border: 4px solid var(--gb-0);
+    box-shadow: inset 2px 2px 5px var(--gb-0);
+}
+
+body.gameboy-mode .scanlines {
+    display: none;
+    /* No scanlines on GB */
+}
+
+body.gameboy-mode h1 {
+    animation: none;
+    text-shadow: 2px 2px 0 var(--gb-1);
+    color: var(--gb-0);
+}
+
+body.gameboy-mode .specs-box,
+body.gameboy-mode .drop-zone {
+    box-shadow: none;
+    border-style: solid;
+    border-width: 3px;
+    animation: none;
+}
+
+body.gameboy-mode .drop-zone:hover {
+    background: var(--gb-2);
+}
+
+body {
+    background: var(--bg);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', 'Courier', monospace;
+    /* Web safe monospace */
+    overflow: hidden;
+    color: var(--neon-green);
+}
+
+/* CRT Frame Device */
+.crt-frame {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow:
+        inset 0 0 20px #000,
+        0 0 0 10px #333,
+        0 20px 50px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 600px;
+    height: 90vh;
+    display: flex;
+}
+
+.screen {
+    background: var(--screen-bg);
+    flex: 1;
+    border-radius: 4px;
+    /* Slight tube curve */
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #111;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.2) 50%,
+            rgba(0, 0, 0, 0.2));
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.ui-layer {
+    position: relative;
+    z-index: 5;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Typography & Elements */
+h1 {
+    font-size: 3rem;
+    line-height: 0.9;
+    text-align: center;
+    color: #fff;
+    text-shadow:
+        0 0 10px var(--neon-pink),
+        0 0 20px var(--neon-pink),
+        0 0 40px var(--neon-pink);
+    margin: 0;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    animation: neon-pulse 1.5s infinite alternate;
+    user-select: none;
+    pointer-events: none;
+    /* Let clicks pass to button container */
+}
+
+/* Logo Button Style */
+.logo-box {
+    background: #222;
+    border: 4px solid #555;
+    border-bottom-color: #111;
+    border-right-color: #111;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 2rem;
+    transition: all 0.1s;
+    box-shadow: 0 5px 0 #000;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.logo-box:hover {
+    background: #333;
+    transform: translateX(-50%) translateY(2px);
+    box-shadow: 0 3px 0 #000;
+}
+
+.logo-box:active {
+    background: #111;
+    transform: translateX(-50%) translateY(5px);
+    box-shadow: 0 0 0 #000;
+    border-color: #333;
+}
+
+body.gameboy-mode .logo-box {
+    border-color: var(--gb-0);
+    background: var(--gb-2);
+    box-shadow: 5px 5px 0 var(--gb-0);
+}
+
+body.gameboy-mode .logo-box:active {
+    box-shadow: 0 0 0 var(--gb-0);
+    transform: translateX(-50%) translate(5px, 5px);
+}
+
+.specs-box {
+    border: 2px solid var(--neon-blue);
+    background: rgba(0, 255, 255, 0.05);
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--neon-blue);
+    margin-bottom: 2rem;
+    box-shadow: 0 0 10px var(--neon-blue), inset 0 0 10px var(--neon-blue);
+    user-select: none;
+    /* Prevent selection */
+    cursor: default;
+}
+
+.drop-zone {
+    border: 4px dashed var(--neon-green);
+    text-align: center;
+    padding: 3rem 1rem;
+    background: rgba(57, 255, 20, 0.02);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    animation: border-pulse 2s infinite;
+}
+
+.drop-zone:hover {
+    background: rgba(57, 255, 20, 0.15);
+    transform: scale(0.98);
+}
+
+.drop-zone:active {
+    transform: scale(0.96);
+    border-style: solid;
+}
+
+/* Pixel Art Arrow via CSS */
+.pixel-arrow {
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 15px solid var(--neon-green);
+    margin: 0 auto 15px auto;
+    animation: bounce 1s infinite alternate steps(4);
+}
+
+/* Rect part of arrow */
+.pixel-arrow::after {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 20px;
+    background: var(--neon-green);
+    position: relative;
+    top: -45px;
+    left: -5px;
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(10px);
+    }
+}
+
+.blink {
+    animation: blink 1s infinite steps(2);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+.small {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+.file-list {
+    margin-top: 1rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.file-item {
+    background: var(--neon-blue);
+    color: #000;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 4px 4px 0 #fff;
+}
+
+.status-text {
+    font-weight: bold;
+}
+
+.status {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    min-height: 1.2rem;
+    color: var(--neon-pink);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-green);
+    border: 2px solid #000;
+}
+
+/* ========== CLASSIFICATION MODE ========== */
+.hidden {
+    display: none !important;
+}
+
+/* Toggle Switch */
+.mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #333;
+    border: 2px solid var(--neon-green);
+    transition: 0.3s;
+}
+
+.toggle-switch .slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--neon-green);
+    transition: 0.3s;
+}
+
+.toggle-switch input:checked + .slider {
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+}
+
+.toggle-switch input:checked + .slider::before {
+    transform: translateX(24px);
+    background: #000;
+}
+
+.toggle-label {
+    color: var(--neon-green);
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Category Panel */
+.category-panel {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--neon-blue);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.category-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.category-input input {
+    flex: 1;
+    background: #111;
+    border: 2px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+}
+
+.category-input input::placeholder {
+    color: #555;
+}
+
+.pixel-btn {
+    background: var(--neon-green);
+    border: none;
+    color: #000;
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.pixel-btn:hover {
+    box-shadow: 0 0 10px var(--neon-green);
+}
+
+.pixel-btn:active {
+    transform: scale(0.95);
+}
+
+.category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.category-tag {
+    background: var(--neon-blue);
+    color: #000;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.category-tag .delete-cat {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.category-tag .delete-cat:hover {
+    opacity: 1;
+}
+
+/* Category Drop Zones */
+.category-zones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.category-drop {
+    border: 3px dashed var(--neon-green);
+    padding: 1rem;
+    text-align: center;
+    background: rgba(78, 201, 176, 0.05);
+    transition: all 0.2s;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.category-drop:hover {
+    background: rgba(78, 201, 176, 0.15);
+}
+
+.category-drop.drag-over {
+    background: rgba(78, 201, 176, 0.3);
+    border-style: solid;
+}
+
+.category-drop .cat-name {
+    font-weight: bold;
+    color: var(--neon-blue);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.category-drop .cat-count {
+    font-size: 0.7rem;
+    color: var(--neon-green);
+}
+
+/* Download Button */
+.download-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--neon-pink);
+    border: none;
+    color: #000;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+}
+
+.download-btn:hover {
+    box-shadow: 0 0 20px var(--neon-pink);
+    transform: scale(1.02);
+}
+
+.download-btn:active {
+    transform: scale(0.98);
+}
