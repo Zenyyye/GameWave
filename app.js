@@ -5,12 +5,83 @@
 // ========== CLASSIFICATION MODE STATE ==========
 let classificationMode = false;
 let categories = []; // { name: 'BGM', files: [] }
+let currentLang = 'en';
+
+// ========== I18N ==========
+const i18n = {
+    en: {
+        classMode: 'Folder Mode',
+        categoryPlaceholder: 'Category name (e.g. BGM)',
+        dropHint: '(DROP FILES HERE)',
+        downloadAll: '📦 Download All (ZIP)',
+        modeEnabled: 'Folder Mode Enabled',
+        normalMode: 'Normal Mode',
+        categoryExists: 'Category exists!',
+        categoryAdded: 'Added: ',
+        converting: 'Converting: ',
+        conversionFailed: 'Conversion failed: ',
+        filesReady: ' files ready ✓',
+        addCategory: 'Add category first!',
+        noFiles: 'No files converted!',
+        packing: 'Packing...',
+        downloadComplete: '✓ Download Complete!',
+        packFailed: 'Pack failed!',
+        skipNonAudio: 'Skipping non-audio file'
+    },
+    zh: {
+        classMode: '分类模式',
+        categoryPlaceholder: '输入分类名 (如 BGM)',
+        dropHint: '(拖放文件到这里)',
+        downloadAll: '📦 下载全部 (ZIP)',
+        modeEnabled: '分类模式已启用',
+        normalMode: '普通模式',
+        categoryExists: '分类已存在!',
+        categoryAdded: '已添加: ',
+        converting: '转换中: ',
+        conversionFailed: '转换失败: ',
+        filesReady: ' 文件就绪 ✓',
+        addCategory: '请先添加分类!',
+        noFiles: '没有已转换的文件!',
+        packing: '正在打包...',
+        downloadComplete: '✓ 下载完成!',
+        packFailed: '打包失败!',
+        skipNonAudio: '跳过非音频文件'
+    }
+};
+
+function t(key) {
+    return i18n[currentLang][key] || key;
+}
+
+function updateUILanguage() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (i18n[currentLang][key]) el.placeholder = i18n[currentLang][key];
+    });
+    const btn = document.getElementById('langToggle');
+    btn.textContent = currentLang === 'en' ? '中' : 'EN';
+    btn.title = currentLang === 'en' ? '切换中文' : 'Switch to English';
+}
+
+function setupLanguageToggle() {
+    const btn = document.getElementById('langToggle');
+    btn.addEventListener('click', () => {
+        currentLang = currentLang === 'en' ? 'zh' : 'en';
+        updateUILanguage();
+        playBeep(600, 0.1, 'square');
+    });
+}
 
 window.onload = function () {
     initParticles();
     console.log("GameWav 8-bit System Initialized");
     setupEasterEgg();
     setupClassificationMode();
+    setupLanguageToggle();
 };
 
 // ========== EASTER EGG ==========
@@ -326,13 +397,13 @@ function setupClassificationMode() {
             defaultDropZone.classList.add('hidden');
             categoryZonesContainer.classList.remove('hidden');
             downloadBtn.classList.remove('hidden');
-            showStatus('分类模式已启用');
+            showStatus(t('modeEnabled'));
         } else {
             categoryPanel.classList.add('hidden');
             defaultDropZone.classList.remove('hidden');
             categoryZonesContainer.classList.add('hidden');
             downloadBtn.classList.add('hidden');
-            showStatus('普通模式');
+            showStatus(t('normalMode'));
         }
         playBeep(800, 0.1, 'square');
     });
@@ -353,7 +424,7 @@ function addCategory() {
 
     if (!name) return;
     if (categories.find(c => c.name === name)) {
-        showStatus('分类已存在!');
+        showStatus(t('categoryExists'));
         return;
     }
 
@@ -363,7 +434,7 @@ function addCategory() {
     renderCategoryTags();
     renderCategoryDropZones();
     playBeep(600, 0.1, 'square');
-    showStatus(`已添加分类: ${name}`);
+    showStatus(t('categoryAdded') + name);
 }
 
 function removeCategory(name) {
@@ -449,12 +520,12 @@ async function handleCategoryDrop(categoryName, files) {
                 cat.files.push({ name: newName, blob: wav });
 
                 processed++;
-                showStatus(`${categoryName}: ${processed}/${total} 转换中...`);
+                showStatus(`${categoryName}: ${processed}/${total} ${t('converting')}`);
 
             } catch (e) {
                 console.error(e);
                 processed++;
-                showStatus(`转换失败: ${file.name}`);
+                showStatus(t('conversionFailed') + file.name);
             }
         }));
 
@@ -466,22 +537,22 @@ async function handleCategoryDrop(categoryName, files) {
     playBeep(1200, 0.1, 'square');
     renderCategoryTags();
     renderCategoryDropZones();
-    showStatus(`${categoryName}: ${cat.files.length} 文件就绪 ✓`);
+    showStatus(`${categoryName}: ${cat.files.length}${t('filesReady')}`);
 }
 
 async function downloadAllAsZip() {
     if (categories.length === 0) {
-        showStatus('请先添加分类!');
+        showStatus(t('addCategory'));
         return;
     }
 
     const totalFiles = categories.reduce((sum, c) => sum + c.files.length, 0);
     if (totalFiles === 0) {
-        showStatus('没有已转换的文件!');
+        showStatus(t('noFiles'));
         return;
     }
 
-    showStatus('正在打包...');
+    showStatus(t('packing'));
     playBeep(400, 0.2, 'square');
 
     const zip = new JSZip();
@@ -507,14 +578,14 @@ async function downloadAllAsZip() {
             URL.revokeObjectURL(url);
         }, 1000);
 
-        showStatus('✓ 下载完成!');
+        showStatus(t('downloadComplete'));
         playBeep(1000, 0.1, 'square');
         setTimeout(() => playBeep(1500, 0.3, 'square'), 100);
         spawnExplosion();
 
     } catch (e) {
         console.error(e);
-        showStatus('打包失败!');
+        showStatus(t('packFailed'));
     }
 }
 

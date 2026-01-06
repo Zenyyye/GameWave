@@ -437,12 +437,12 @@ body.gameboy-mode .logo-box:active {
     transition: 0.3s;
 }
 
-.toggle-switch input:checked + .slider {
+.toggle-switch input:checked+.slider {
     background: var(--neon-green);
     box-shadow: 0 0 10px var(--neon-green);
 }
 
-.toggle-switch input:checked + .slider::before {
+.toggle-switch input:checked+.slider::before {
     transform: translateX(24px);
     background: #000;
 }
@@ -592,4 +592,28 @@ body.gameboy-mode .logo-box:active {
 
 .download-btn:active {
     transform: scale(0.98);
+}
+
+/* Language Toggle */
+.lang-toggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    background: #222;
+    border: 2px solid var(--neon-green);
+    color: var(--neon-green);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.lang-toggle:hover {
+    background: var(--neon-green);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-green);
 }

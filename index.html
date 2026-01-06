@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,9 @@
 </head>
 
 <body>
+    <!-- Language Toggle -->
+    <button id="langToggle" class="lang-toggle" title="切换中文">中</button>
+
     <div class="crt-frame">
         <div class="screen">
             <div class="scanlines"></div>
@@ -33,13 +36,14 @@
                         <input type="checkbox" id="classificationToggle">
                         <span class="slider"></span>
                     </label>
-                    <span class="toggle-label">分类模式</span>
+                    <span class="toggle-label" data-i18n="classMode">Folder Mode</span>
                 </div>
 
                 <!-- Category Management Panel (hidden by default) -->
                 <div id="categoryPanel" class="category-panel hidden">
                     <div class="category-input">
-                        <input type="text" id="categoryName" placeholder="输入分类名 (如 BGM)" maxlength="20">
+                        <input type="text" id="categoryName" data-i18n-placeholder="categoryPlaceholder"
+                            placeholder="Category name (e.g. BGM)" maxlength="20">
                         <button id="addCategoryBtn" class="pixel-btn">+</button>
                     </div>
                     <div id="categoryList" class="category-list"></div>
@@ -53,7 +57,7 @@
                             <div class="pixel-arrow"></div>
                         </div>
                         <p class="blink">INSERT DISC</p>
-                        <p class="small">(DROP FILES HERE)</p>
+                        <p class="small" data-i18n="dropHint">(DROP FILES HERE)</p>
                         <input type="file" id="fileInput" accept=".mp3,.wav,.aiff,.aif" multiple hidden>
                     </div>
                 </div>
@@ -62,7 +66,8 @@
                 <div id="categoryDropZones" class="category-zones hidden"></div>
 
                 <!-- Download All Button (shown when classification ON) -->
-                <button id="downloadAllBtn" class="download-btn hidden">📦 下载全部 (ZIP)</button>
+                <button id="downloadAllBtn" class="download-btn hidden" data-i18n="downloadAll">📦 Download All
+                    (ZIP)</button>
 
                 <div id="fileList" class="file-list"></div>
                 <div id="status" class="status">READY PLAYER ONE</div>
